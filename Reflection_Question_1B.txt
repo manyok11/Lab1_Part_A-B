@@ -1,0 +1,137 @@
+ ==============================
+  16. Reflection Questions
+ ==============================
+
+
+ 16.1 Heuristic Functions
+
+1. What does h(n) estimate, and where does its knowledge come from?
+h(n) estimates the remaining cost from the current cell to the goal. That knowledge
+comes from GPS — the drone knows its grid position and the goal's position, so it
+computes a geometric distance (Manhattan or Euclidean) as a proxy for remaining travel cost.
+
+2. Which restrictions does the Manhattan relaxed problem remove?
+It removes obstacles (every cell is passable), non-uniform terrain costs (every move
+costs 1), and any constraint that cells must be entered in a particular order.
+
+3. Which heuristic dominates, and what does domination predict?
+Manhattan dominates Euclidean (Manhattan >= Euclidean everywhere). A more informed
+admissible heuristic means A\* prunes more nodes, so A\* with Manhattan typically
+expands fewer nodes than A\* with Euclidean while still guaranteeing optimality.
+
+4. Why do terrain costs >= 1 keep Manhattan admissible?
+Each move changes one coordinate by 1 and costs at least 1, so the true remaining
+cost is always at least the Manhattan distance. A cost of 0.5 would let a move reduce
+Manhattan by 1 while costing only 0.5, making h(n) overestimate the true cost.
+
+ ==============================
+16.2 Greedy Best-First Search
+ ==============================
+
+1. Which quantity does Greedy ignore, and how did the turbulence map punish it?
+Greedy ignores g(n). On the turbulence map it flew straight through the cost-9 band
+(cost 30) because Manhattan distance decreased fastest that way, never noticing that
+accumulated cost was exploding.
+
+2. Why is fewer expansions not enough to call Greedy better?
+Greedy expanded 6 nodes vs A\*'s 25, but produced a path costing 30 vs A\*'s 10.
+For a battery-limited drone, a path three times more expensive is a worse outcome.
+
+3. When would Greedy be acceptable?
+During rapid exploratory scouting where any reachable point is acceptable and battery
+cost does not matter — e.g., confirming whether a smoke plume is visible from any
+vantage point as quickly as possible.
+
+ ==============================
+ 16.3 A\* Search
+ ==============================
+
+1. Explain f(n) = g(n) + h(n) in one sentence.
+f(n) is the estimated total flight cost from start to goal passing through this cell:
+what the drone has already spent plus what it estimates it still needs to spend.
+
+2. Why must A\* apply the goal test when a node is popped?
+If A\* stopped when the goal first appeared on the frontier, it might accept a costly
+route through turbulence while a cheaper detour with lower f(n) was still waiting in
+the queue. Popping first ensures no cheaper path is overlooked.
+
+3. Why does reached need to be a dictionary? 
+With non-uniform terrain costs, the first path to a state may not be the cheapest.
+BFS on unit-cost grids always arrives optimally first, so a set was enough in Part A.
+Here we must remember the best path cost per state and allow re-discovery.
+
+3. UCS vs A\* on the sample map: 
+UCS expanded around 52 nodes; A\* expanded around 18. The gap shows how much the
+Manhattan heuristic prunes the search by always preferring cells that look geometrically
+closer to the goal.
+
+ ====================================
+ 16.4 Admissibility and Consistency
+ ====================================
+
+1. Definitions and implication: 
+Admissible: h(n) <= h\*(n) for all nodes (never overestimates).  
+Consistent: h(n) <= c(n,a,n') + h(n') for every edge (triangle inequality).  
+Consistency implies admissibility, but not vice versa.
+
+2. What did the experiment show?
+On the mild turbulence map, 3x Manhattan caused A\* to return cost 12 instead of
+optimal 10, confirming that optimality requires admissibility. On the uniform map
+both returned cost 18 — inadmissibility removes the guarantee without always
+causing failure.
+
+3. Is Manhattan consistent on a unit-cost grid?
+Yes. For any single move, c = 1 and Manhattan changes by exactly 1 (one coordinate
+changes, the other is unchanged). So h(n) - h(n') <= 1 = c, satisfying the triangle
+inequality at every edge.
+
+ ==============================
+16.5 Weighted A\* and Trade-offs
+ ==============================
+
+1. How does W interpolate?  
+W = 0 gives UCS; W = 1 gives standard A\*; W > 1 makes the search greedier,
+approaching pure Greedy as W tends to infinity.
+
+2. Suboptimality bound:
+Weighted A\* guarantees solution cost <= W times the optimal cost. On the turbulence
+map, optimal cost was 10 and Weighted A\* (W=2) also returned 10 — well inside
+the bound of 20.
+
+3. 90-second battery margin, slow computer:
+Weighted A\* with W = 2. It expanded roughly half as many nodes as standard A\*
+on the turbulence map while still finding the optimal path, giving a good balance
+between computation time and solution quality.
+
+ =========================================
+16.6 Memory and Real-World Drone Context
+ =========================================
+
+1. What makes A\* memory-hungry?
+The frontier priority queue and the reached dictionary can each hold O(b^d) nodes.
+IDA\* avoids this by keeping only O(d) memory for the current path, but re-expands
+nodes across iterations as the f-cost limit increases.
+
+2. What would you add to terrain costs? 
+Real-time wind speed and direction, dynamic no-fly zones, battery depletion rate
+per terrain type, precipitation, and time-of-day visibility constraints.
+
+3. Moving target goal:
+A fixed heuristic becomes invalid because it points to the wrong location. Relevant
+approaches include replanning with updated heuristics, real-time search (LRTA\*),
+and learned heuristics trained on pursuit scenarios.
+
+4. Which algorithm to ship? 
+Standard A\* with Manhattan for routine missions where optimality matters.
+Switch to Weighted A\* (W=2) under tight time constraints, or IDA\* on
+memory-constrained hardware. Reconsider whenever terrain costs or goal positions
+become dynamic.
+
+
+user_name = "admin"
+correct_password = "python123"
+
+user_name = input(" plx enter ur user_name: ")
+correct_password = input(" plx enter ur ur correct_passworde: ")
+
+if user_name ==

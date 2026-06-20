@@ -1,0 +1,103 @@
+ 
+ 
+ ==============================
+  Reflection Questions
+ ==============================
+
+
+15.1 Problem Formulation
+
+ 1. What is a state in this lab?
+
+A state is a tuple (row, col) representing the drone's current position on the grid.
+
+2. What is an action?
+An action is one of UP, DOWN, LEFT, or RIGHT — a direction the drone moves to an adjacent free cell.
+
+3. What does the result function do?
+It takes the current state and an action and returns the new cell the drone lands on after that move.
+
+4. Why is it useful to separate the problem definition from the search algorithm?
+Because the same BFS or DFS can then work on any problem without changing the search logic. The algorithm only needs to know the Problem interface, not the specific environment.
+
+=================================
+
+ 15.2 BFS
+=================================
+
+1. Why does BFS use a FIFO queue?
+BFS needs to explore all nodes at depth d before moving to depth d+1. A FIFO queue does this because nodes added earlier (shallower) are removed first.
+
+2. Why does BFS find the shortest path on an unweighted grid?
+Since every step costs 1, the first time BFS reaches the goal it has used the fewest moves. No shorter path can exist because BFS would have already found it at a lower depth.
+
+3. What role does the reached set play in BFS?
+It stops the same cell from being added to the frontier more than once, avoiding repeated work and infinite loops.
+
+================================
+
+ 15.3 DFS
+================================
+
+1. Why does DFS use a stack? 
+A stack makes DFS always expand the most recently discovered node, so it goes as deep as possible before backtracking.
+
+2.Is DFS guaranteed to find the shortest path?
+No. DFS returns the first solution it finds, which may be much longer than optimal. BFS guarantees the shortest path on unweighted grids.
+
+3. When can DFS use less memory than BFS?
+DFS only keeps the current path and unexplored siblings on the stack, so memory is proportional to the depth. BFS stores all nodes at the current frontier level, which can be much larger.
+
+4. When can DFS perform badly? 
+When the goal is shallow but DFS dives into a very deep branch first. Also in very deep or infinite spaces without cycle detection or depth limits.
+
+================================
+
+15.4 DLS
+================================
+
+1. What happens when the depth limit is too small? 
+DLS returns a cutoff result — it stopped before finding a solution that may exist deeper.
+
+2. What is the meaning of cutoff?
+Cutoff means no solution was found within the depth limit. It does not mean no solution exists.
+
+3. How is DLS different from ordinary DFS?
+DLS refuses to expand nodes beyond a given depth. DFS has no such limit.
+
+4. Why do we use path-cycle checking in DLS?  
+DLS has no global reached set, so path-cycle checking stops it from revisiting cells on the current branch without blocking the same cell from other routes.
+
+================================
+
+15.5 IDS
+================================
+
+1. Why does IDS repeat DLS with increasing limits?
+Each DLS run fully explores the space up to depth d. Increasing by 1 each time guarantees the shallowest solution is found first.
+
+2. Why can IDS be complete even though DLS with a small limit is not?
+IDS keeps increasing the limit. As long as the solution is at some finite depth, IDS will reach it.
+
+4. Why does IDS use less memory than BFS? 
+Each DLS run only uses stack space proportional to the current depth. IDS never stores the full frontier of a wide level at once.
+
+5. What is the cost of repeatedly searching from the root?
+Shallow levels are re-expanded many times. Total work is O(b^d) — same as BFS asymptotically — but with a constant overhead from re-expansion.
+
+================================
+
+15.6 Real-World Drone Context
+================================
+
+1. What might make one route safer or more practical?
+Battery level, wind, restricted airspace, terrain elevation, signal coverage, risk over populated areas, and the number of direction changes all affect the route.
+
+2. Which algorithm for fewest moves?
+BFS — it is guaranteed to find the shortest path when all step costs are equal, because it explores level by level and returns the first solution at the minimum depth.
+
+3. Which algorithm to limit search depth?
+DLS — it directly accepts a depth limit and refuses to go beyond it, making it useful when the drone has a hard constraint on how far it can fly.
+
+4. Limitations of this grid model? 
+The grid uses discrete uniform movement. Real navigation involves continuous 3D space, variable speeds, wind, GPS inaccuracy, dynamic obstacles, battery constraints, and camera coverage requirements.
